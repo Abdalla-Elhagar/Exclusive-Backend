@@ -3,10 +3,10 @@ import env from "dotenv";
 import mongoose from "mongoose";
 import userRouter from "./routes/user.js";
 import productRouter from "./routes/product.js";
-import cartRouter from "./routes/cart.js"
-import favoriteRouter from "./routes/favorite.js"
+import cartRouter from "./routes/cart.js";
+import favoriteRouter from "./routes/favorite.js";
 import cookieParser from "cookie-parser";
-import cors from "cors"
+import cors from "cors";
 import { seedProducts } from "./services/productServices/seedProducts.js";
 
 env.config();
@@ -17,15 +17,16 @@ const DB_USERNAME = process.env.DB_USERNAME;
 const DB_PASSWORD = process.env.DB_PASSWORD;
 
 mongoose
-  .connect(`mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@cluster0.zvczkti.mongodb.net/Exclusive?retryWrites=true&w=majority&appName=Cluster0
-`)
+  .connect(
+    `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@cluster0.zvczkti.mongodb.net/Exclusive?retryWrites=true&w=majority&appName=Cluster0
+`
+  )
   .then(() => {
     console.log("connected with DB");
   })
   .catch((err) => {
     console.log(err);
   });
-
 
 const allowedOrigins = [
   "http://localhost:5173",
@@ -38,14 +39,12 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        console.log("❌ Blocked by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
   })
 );
-
 
 app.get("/", (req, res) => {
   res.send("API working fine!");
@@ -59,8 +58,7 @@ app.use("/products", productRouter);
 app.use("/cart", cartRouter);
 app.use("/favorite", favoriteRouter);
 
-
-seedProducts()
+seedProducts();
 
 app.listen(PORT || 5000, () => {
   try {
@@ -69,4 +67,3 @@ app.listen(PORT || 5000, () => {
     console.log(err);
   }
 });
-
