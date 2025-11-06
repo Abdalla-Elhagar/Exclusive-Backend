@@ -15,7 +15,6 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
-// 🔥 إعداد CORS مضبوط 100% لمواقعك
 const allowedOrigins = [
   "http://localhost:5173",
   "https://exclusive-frontend-tau.vercel.app",
@@ -50,22 +49,29 @@ app.get("/", (req, res) => {
 });
 
 app.get("/proxy-image", async (req, res) => {
-  const { url } = req.query;
-
-  if (!url) return res.status(400).json({ error: "Missing image URL" });
-
   try {
+    const { url } = req.query;
+
+    if (!url) {
+      return res.status(400).json({ error: "Missing image URL" });
+    }
+
     const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch image");
 
-    const contentType = response.headers.get("content-type") || "image/jpeg";
-    const buffer = await response.arrayBuffer();
+    if (!response.ok) {
+      return res
+        .status(response.status)
+        .json({ error: "Failed to load image" });
+    }
 
-    res.set("Content-Type", contentType);
-    res.send(Buffer.from(buffer));
-  } catch (err) {
-    console.error("Image proxy error:", err);
-    res.status(500).json({ error: "Failed to fetch image" });
+    const contentType = response.headers.get("content-type") || "image/jpg";
+    const arrayBuffer = await response.arrayBuffer();
+
+    res.setHeader("Content-Type", contentType);
+    res.send(Buffer.from(arrayBuffer));
+  } catch (error) {
+    console.error("Proxy image error:", error.message);
+    res.status(500).json({ error: "IMG_FAILED_LOAD" });
   }
 });
 
