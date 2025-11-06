@@ -24,13 +24,9 @@ export const handleRegister = async (req, res) => {
 
     const token = generateJWT(newUser);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-      maxAge: 86400000,
-    });
+    const cookieOptions = req.app.locals.getCookieOptions();
+
+    res.cookie("token", token, cookieOptions);
 
     return res.status(200).json({
       message: "User registered successfully",

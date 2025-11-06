@@ -16,8 +16,11 @@ app.use(express.json());
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:3000",
   "https://exclusive-frontend-tau.vercel.app",
 ];
+
+const isDevelopment = process.env.NODE_ENV !== "production";
 
 app.use(
   cors({
@@ -47,6 +50,18 @@ app.get("/", (req, res) => {
   res.send("API working fine!");
 });
 
+const getCookieOptions = () => {
+  return {
+    httpOnly: true,
+    secure: !isDevelopment,
+    sameSite: isDevelopment ? "lax" : "none",
+    path: "/",
+    maxAge: 86400000,
+  };
+};
+
+app.locals.getCookieOptions = getCookieOptions;
+
 app.use("/users", userRouter);
 app.use("/products", productRouter);
 app.use("/cart", cartRouter);
@@ -56,4 +71,5 @@ seedProducts();
 
 app.listen(PORT || 5000, () => {
   console.log(`Server running on port ${PORT || 5000}`);
+  console.log(`Environment: ${isDevelopment ? "Development" : "Production"}`);
 });
