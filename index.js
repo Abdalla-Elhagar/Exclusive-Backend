@@ -7,7 +7,6 @@ import cartRouter from "./routes/cart.js";
 import favoriteRouter from "./routes/favorite.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import fetch from "node-fetch";
 import { seedProducts } from "./services/productServices/seedProducts.js";
 
 env.config();
@@ -46,33 +45,6 @@ mongoose
 
 app.get("/", (req, res) => {
   res.send("API working fine!");
-});
-
-app.get("/proxy-image", async (req, res) => {
-  try {
-    const { url } = req.query;
-
-    if (!url) {
-      return res.status(400).json({ error: "Missing image URL" });
-    }
-
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      return res
-        .status(response.status)
-        .json({ error: "Failed to load image" });
-    }
-
-    const contentType = response.headers.get("content-type") || "image/jpg";
-    const arrayBuffer = await response.arrayBuffer();
-
-    res.setHeader("Content-Type", contentType);
-    res.send(Buffer.from(arrayBuffer));
-  } catch (error) {
-    console.error("Proxy image error:", error.message);
-    res.status(500).json({ error: "IMG_FAILED_LOAD" });
-  }
 });
 
 app.use("/users", userRouter);
