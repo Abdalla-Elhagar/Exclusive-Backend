@@ -27,7 +27,7 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-
+app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:5173",
   "https://exclusive-frontend-tau.vercel.app",
@@ -35,13 +35,7 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: allowedOrigins,
     credentials: true,
   })
 );
@@ -50,7 +44,6 @@ app.get("/", (req, res) => {
   res.send("API working fine!");
 });
 
-app.use(cookieParser());
 app.use(express.json());
 
 app.use("/users", userRouter);

@@ -1,4 +1,4 @@
-import {userModel} from "../../models/user.js";
+import { userModel } from "../../models/user.js";
 import bcrypt from "bcrypt";
 import { generateJWT } from "../../utils/generateJWT.js";
 
@@ -28,6 +28,7 @@ export const handleRegister = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
+      path: "/",
       maxAge: 86400000,
     });
 
