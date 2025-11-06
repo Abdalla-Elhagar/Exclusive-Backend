@@ -7,28 +7,15 @@ import cartRouter from "./routes/cart.js";
 import favoriteRouter from "./routes/favorite.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import fetch from "node-fetch";
 import { seedProducts } from "./services/productServices/seedProducts.js";
 
 env.config();
 const app = express();
+
 app.use(cookieParser());
 app.use(express.json());
 
-const PORT = process.env.PORT;
-const DB_USERNAME = process.env.DB_USERNAME;
-const DB_PASSWORD = process.env.DB_PASSWORD;
-
-mongoose
-  .connect(
-    `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@cluster0.zvczkti.mongodb.net/Exclusive?retryWrites=true&w=majority&appName=Cluster0
-`
-  )
-  .then(() => {
-    console.log("connected with DB");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
 const allowedOrigins = [
   "http://localhost:5173",
   "https://exclusive-frontend-tau.vercel.app",
@@ -36,16 +23,49 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
+const { DB_USERNAME, DB_PASSWORD, PORT } = process.env;
+
+mongoose
+  .connect(
+    `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@cluster0.zvczkti.mongodb.net/Exclusive?retryWrites=true&w=majority`
+  )
+  .then(() => console.log("Connected with DB"))
+  .catch((err) => console.error("DB Error:", err));
 
 app.get("/", (req, res) => {
   res.send("API working fine!");
 });
 
-app.use(express.json());
+app.get("/proxy-image", async (req, res) => {
+  const { url } = req.query;
+
+  if (!url) return res.status(400).json({ error: "Missing image URL" });
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch image");
+
+    const contentType = response.headers.get("content-type") || "image/jpeg";
+    const buffer = await response.arrayBuffer();
+
+    res.set("Content-Type", contentType);
+    res.send(Buffer.from(buffer));
+  } catch (err) {
+    console.error("Image proxy error:", err);
+    res.status(500).json({ error: "Failed to fetch image" });
+  }
+});
 
 app.use("/users", userRouter);
 app.use("/products", productRouter);
@@ -55,9 +75,5 @@ app.use("/favorite", favoriteRouter);
 seedProducts();
 
 app.listen(PORT || 5000, () => {
-  try {
-    console.log("the server is running");
-  } catch (err) {
-    console.log(err);
-  }
+  console.log(`Server running on port ${PORT || 5000}`);
 });
