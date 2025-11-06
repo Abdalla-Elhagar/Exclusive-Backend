@@ -10,17 +10,28 @@ import cors from "cors";
 import { seedProducts } from "./services/productServices/seedProducts.js";
 
 env.config();
+
 const app = express();
-app.use(cookieParser());
-app.use(express.json());
+const PORT = process.env.PORT;
+const DB_USERNAME = process.env.DB_USERNAME;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+
+mongoose
+  .connect(
+    `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@cluster0.zvczkti.mongodb.net/Exclusive?retryWrites=true&w=majority&appName=Cluster0
+`
+  )
+  .then(() => {
+    console.log("connected with DB");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://localhost:3000",
   "https://exclusive-frontend-tau.vercel.app",
 ];
-
-const isDevelopment = process.env.NODE_ENV !== "production";
 
 app.use(
   cors({
@@ -28,46 +39,20 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.log("❌ Blocked by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    exposedHeaders: ["Set-Cookie"],
   })
 );
-
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Vary", "Origin");
-  next();
-});
-
-const { DB_USERNAME, DB_PASSWORD, PORT } = process.env;
-
-mongoose
-  .connect(
-    `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@cluster0.zvczkti.mongodb.net/Exclusive?retryWrites=true&w=majority`
-  )
-  .then(() => console.log("Connected with DB"))
-  .catch((err) => console.error("DB Error:", err));
 
 app.get("/", (req, res) => {
   res.send("API working fine!");
 });
 
-const getCookieOptions = () => {
-  return {
-    httpOnly: true,
-    secure: !isDevelopment,
-    sameSite: isDevelopment ? "lax" : "none",
-    path: "/",
-    maxAge: 86400000,
-  };
-};
-
-app.locals.getCookieOptions = getCookieOptions;
+app.use(cookieParser());
+app.use(express.json());
 
 app.use("/users", userRouter);
 app.use("/products", productRouter);
@@ -77,6 +62,9 @@ app.use("/favorite", favoriteRouter);
 seedProducts();
 
 app.listen(PORT || 5000, () => {
-  console.log(`Server running on port ${PORT || 5000}`);
-  console.log(`Environment: ${isDevelopment ? "Development" : "Production"}`);
+  try {
+    console.log("the server is running");
+  } catch (err) {
+    console.log(err);
+  }
 });
