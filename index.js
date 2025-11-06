@@ -10,8 +10,10 @@ import cors from "cors";
 import { seedProducts } from "./services/productServices/seedProducts.js";
 
 env.config();
-
 const app = express();
+app.use(cookieParser());
+app.use(express.json());
+
 const PORT = process.env.PORT;
 const DB_USERNAME = process.env.DB_USERNAME;
 const DB_PASSWORD = process.env.DB_PASSWORD;
@@ -27,7 +29,6 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:5173",
   "https://exclusive-frontend-tau.vercel.app",

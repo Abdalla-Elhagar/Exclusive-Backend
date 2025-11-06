@@ -3,7 +3,7 @@ import { userModel } from "../models/user.js";
 
 export const verifyJWT = async (req, res, next) => {
   try {
-    const token = req.cookies.token; 
+    const token = req.cookies?.token;
 
     if (!token) {
       return res.status(401).json({ message: "No token found" });
@@ -19,7 +19,7 @@ export const verifyJWT = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    console.log("JWT Error:", err);
-    return res.status(401).json({ message: "Invalid token" });
+    console.error("JWT Error:", err.message);
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
