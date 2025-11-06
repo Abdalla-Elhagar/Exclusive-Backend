@@ -12,10 +12,10 @@ import { seedProducts } from "./services/productServices/seedProducts.js";
 
 env.config();
 const app = express();
-
 app.use(cookieParser());
 app.use(express.json());
 
+// 🔥 إعداد CORS مضبوط 100% لمواقعك
 const allowedOrigins = [
   "http://localhost:5173",
   "https://exclusive-frontend-tau.vercel.app",
@@ -30,6 +30,16 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+app.options(
+  "*",
+  cors({
+    origin: allowedOrigins,
     credentials: true,
   })
 );
