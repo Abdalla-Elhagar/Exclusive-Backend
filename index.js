@@ -34,8 +34,15 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Set-Cookie"],
   })
 );
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Vary", "Origin");
+  next();
+});
 
 const { DB_USERNAME, DB_PASSWORD, PORT } = process.env;
 
