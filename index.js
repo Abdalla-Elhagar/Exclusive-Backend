@@ -36,14 +36,6 @@ app.use(
   })
 );
 
-app.options(
-  "*",
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-);
-
 const { DB_USERNAME, DB_PASSWORD, PORT } = process.env;
 
 mongoose
