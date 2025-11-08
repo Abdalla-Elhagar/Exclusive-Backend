@@ -27,7 +27,9 @@ export const handleLogin = async (req, res) => {
     httpOnly: true,
     secure: true,
     sameSite: "none",
+    path: "/",
     maxAge: 86400000,
+    domain: undefined,
   });
 
   return res.status(201).json({

@@ -28,7 +28,9 @@ export const handleRegister = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
+      path: "/",
       maxAge: 86400000,
+      domain: undefined,
     });
 
     return res.status(200).json({
