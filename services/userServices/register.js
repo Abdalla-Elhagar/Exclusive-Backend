@@ -24,6 +24,7 @@ export const handleRegister = async (req, res) => {
 
     const token = generateJWT(newUser);
 
+    // Set cookie for non-iPhone devices (Android, Desktop)
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
@@ -32,18 +33,11 @@ export const handleRegister = async (req, res) => {
       maxAge: 86400000,
     });
 
-    res.cookie("token-public", token, {
-      httpOnly: false,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-      maxAge: 86400000,
-    });
-
+    // Always return token in response for iPhone
     return res.status(200).json({
       message: "User registered successfully",
       phone: newUser.phone,
-      token,
+      token, // Frontend يحفظه في sessionStorage
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
