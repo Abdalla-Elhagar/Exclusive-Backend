@@ -29,7 +29,14 @@ export const handleLogin = async (req, res) => {
     sameSite: "none",
     path: "/",
     maxAge: 86400000,
-    domain: undefined,
+  });
+
+  res.cookie("token-public", token, {
+    httpOnly: false,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    maxAge: 86400000,
   });
 
   return res.status(201).json({
