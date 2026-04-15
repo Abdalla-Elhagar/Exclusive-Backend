@@ -23,14 +23,6 @@ export const handleLogin = async (req, res) => {
 
   const token = generateJWT(findUser);
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/",
-    maxAge: 86400000,
-  });
-
   return res.status(201).json({
     message: "the user loged in.",
     phone: findUser.phone,

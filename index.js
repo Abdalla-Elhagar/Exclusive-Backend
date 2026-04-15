@@ -34,7 +34,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: ["Set-Cookie"],
-  })
+  }),
 );
 
 app.use((req, res, next) => {
@@ -43,12 +43,10 @@ app.use((req, res, next) => {
   next();
 });
 
-const { DB_USERNAME, DB_PASSWORD, PORT } = process.env;
+const { MONGO_URL, PORT } = process.env;
 
 mongoose
-  .connect(
-    `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@cluster0.zvczkti.mongodb.net/Exclusive?retryWrites=true&w=majority`
-  )
+  .connect(MONGO_URL)
   .then(() => console.log("Connected with DB"))
   .catch((err) => console.error("DB Error:", err));
 
