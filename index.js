@@ -44,10 +44,22 @@ app.use((req, res, next) => {
 });
 
 const { MONGO_URL, PORT } = process.env;
-
+let seed = true;
 mongoose
   .connect(MONGO_URL)
-  .then(() => console.log("Connected with DB"))
+  .then(async () => {
+    console.log("Connected with DB");
+
+    if (seed === "true") {
+      await seedProducts();
+    }
+
+    seed = false;
+
+    app.listen(PORT || 5000, () => {
+      console.log(`Server running on port ${PORT || 5000}`);
+    });
+  })
   .catch((err) => console.error("DB Error:", err));
 
 app.get("/", (req, res) => {
